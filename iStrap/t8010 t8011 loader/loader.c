@@ -30,7 +30,7 @@ extern void *find_ttbr0_entry_end(void *start, uint64_t *ttbr0);
 extern void *asm_read_ttbr0();
 
 void patch_iBoot(void *image, void *args) {
-    sequence sequences[3];
+    sequence sequences[4];
 
     // Patch TZ0 lock
     sequences[0].sequence = (void*) &tz0_lock_sequence;
@@ -52,7 +52,7 @@ void patch_iBoot(void *image, void *args) {
     sequences[3].size = 12;
     sequences[3].location = NULL;
     
-    bool result = findSequences(image, IMAGE_MAX_SIZE, sequences, 3);
+    bool result = findSequences(image, IMAGE_MAX_SIZE, sequences, 4);
     if (!result) {
         return;
     }

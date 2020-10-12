@@ -174,7 +174,6 @@ tz0_lock_hook:
     SUB X9, X26, #0x310
     STR W8, [X9]
 
-
 .data
 hooker_lr_save:
     .quad 0
