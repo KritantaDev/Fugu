@@ -16,10 +16,12 @@ uint64_t iBoot_end = iBOOT_MAGIC;
 
 extern void main_iStrap(void *image, void *args, void *iBoot_base, void *iBoot_end);
 
+extern void tz0_lock_sequence();
 extern void iBoot_hook_sequence();
 extern void ttbr0_write_sequence_el1();
 extern void sctlr_write_sequence_el1();
 
+extern void tz0_lock_hook();
 extern void iBoot_hook();
 extern void asm_ttbr0_hook_shellcode();
 extern void custom_sctlr_write_sequence_el1();
@@ -29,6 +31,11 @@ extern void *asm_read_ttbr0();
 
 void patch_iBoot(void *image, void *args) {
     sequence sequences[3];
+
+    // Patch TZ0 lock
+    sequences[0].sequence = (void*) &tz0_lock_sequence;
+    sequences[0].size = 40;
+    sequences[0].location = NULL;
     
     // Patch iBoot trampoline
     sequences[0].sequence = (void*) &iBoot_hook_sequence;
@@ -50,6 +57,9 @@ void patch_iBoot(void *image, void *args) {
         return;
     }
     
+    // Patch TZ0 lock
+    cpyMem(sequences[0].location, (void*) &tz0_lock_hook, 40);
+
     // Patch iBoot trampoline
     cpyMem(sequences[0].location, (void*) &iBoot_hook, 8);
     
