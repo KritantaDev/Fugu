@@ -163,16 +163,17 @@ iBoot_hook:
 
 .global tz0_lock_hook
 tz0_lock_hook:
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+    MOV X8, #0x8D20
+    LSL X8, X8, #0x4
+    SUB X9, X26, #0x314
+    STR W8, [X9]
+    MOV X8, #0x8DDF
+    LSL X8, X8, #0x4
+    ADD X8, X8, #0xF
+    NOP
+    SUB X9, X26, #0x310
+    STR W8, [X9]
+
 
 .data
 hooker_lr_save:
