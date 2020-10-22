@@ -35,6 +35,7 @@
 		15A9625423E7206300831666 /* LICENSE in CopyFiles */ = {isa = PBXBuildFile; fileRef = 15A9624E23E714B000831666 /* LICENSE */; };
 		15DAC6E6236727C50082FC3F /* iDownload.z in CopyFiles */ = {isa = PBXBuildFile; fileRef = 15DAC6E5236727C50082FC3F /* iDownload.z */; };
 		15E8B765236CFB450014BC7F /* PwnUSBImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E8B764236CFB450014BC7F /* PwnUSBImplementation.swift */; };
+		666BC5962541003B00C418CB /* checkm8_arm64_8015.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 666BC5932541003B00C418CB /* checkm8_arm64_8015.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,7 @@
 				150A1EBE235B940D00B900C5 /* usb_0xA1_2_arm64.bin in CopyFiles */,
 				150A1EBF235B940D00B900C5 /* t8010_t8011_disable_wxn_arm64.bin in CopyFiles */,
 				15DAC6E6236727C50082FC3F /* iDownload.z in CopyFiles */,
+				666BC5962541003B00C418CB /* checkm8_arm64_8015.bin in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +147,8 @@
 		15DAC6DB236725AB0082FC3F /* iDownload.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = iDownload.xcodeproj; path = iDownload/iDownload.xcodeproj; sourceTree = "<group>"; };
 		15DAC6E5236727C50082FC3F /* iDownload.z */ = {isa = PBXFileReference; lastKnownFileType = file; name = iDownload.z; path = iDownload/build/iDownload.z; sourceTree = "<group>"; };
 		15E8B764236CFB450014BC7F /* PwnUSBImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PwnUSBImplementation.swift; sourceTree = "<group>"; };
+		666BC5932541003B00C418CB /* checkm8_arm64_8015.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = checkm8_arm64_8015.bin; sourceTree = "<group>"; };
+		66CE4631254101E600E2A9D8 /* checkm8_arm64_8015.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = checkm8_arm64_8015.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +184,7 @@
 		150A1EAA235B8FA300B900C5 /* Shellcode */ = {
 			isa = PBXGroup;
 			children = (
+				66CE4631254101E600E2A9D8 /* checkm8_arm64_8015.S */,
 				150A1EB1235B902700B900C5 /* Makefile */,
 				150A1EAD235B901900B900C5 /* checkm8_arm64.S */,
 				150A1EAC235B901800B900C5 /* usb_0xA1_2_arm64.S */,
@@ -195,6 +200,7 @@
 				150A1EBA235B93DF00B900C5 /* checkm8_arm64.bin */,
 				150A1EB9235B93DF00B900C5 /* usb_0xA1_2_arm64.bin */,
 				150A1EBB235B93E000B900C5 /* t8010_t8011_disable_wxn_arm64.bin */,
+				666BC5932541003B00C418CB /* checkm8_arm64_8015.bin */,
 			);
 			name = Build;
 			sourceTree = "<group>";
@@ -293,7 +299,7 @@
 		15DAC6DC236725AB0082FC3F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				15DAC6E1236725AB0082FC3F /* macOS_test */,
+				15DAC6E1236725AB0082FC3F /* iDownload_macOS_test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -395,10 +401,10 @@
 			remoteRef = 150A1E9B235B848B00B900C5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		15DAC6E1236725AB0082FC3F /* macOS_test */ = {
+		15DAC6E1236725AB0082FC3F /* iDownload_macOS_test */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			path = macOS_test;
+			path = iDownload_macOS_test;
 			remoteRef = 15DAC6E0236725AB0082FC3F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
